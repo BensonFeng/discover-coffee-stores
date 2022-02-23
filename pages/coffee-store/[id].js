@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Head from "next/head";
 
 import { useRouter } from "next/router";
 
@@ -17,30 +18,39 @@ export async function getStaticProps(staticProps) {
 }
 
 export async function getStaticPaths() {
+  const paths = coffeeStoresData.map((coffeeStore) => {
+    return {
+      params: {
+        id: coffeeStore.id.toString(),
+      },
+    };
+  });
   return {
-    paths: [{ params: { id: "0" } }, { params: { id: "1" } }],
-    fallback: false,
+    paths,
+    fallback: true,
   };
 }
-
 const CoffeeStore = (props) => {
   const router = useRouter();
-  const { id } = router.query;
-
   console.log("router", router);
-  console.log("props", props);
 
+  if (router.isFallback) {
+    return <div>Loading...</div>;
+  }
+  const { address, name, neighbourhood } = props.coffeeStore;
+
+  console.log("props", props);
   return (
     <div>
-      Coffee Store Page {id}
+      <Head>
+        <title>{name}</title>
+      </Head>
       <Link href="/">
         <a>Back to home</a>
       </Link>
-      <Link href="/coffee-store/">
-        <a>Back to home</a>
-      </Link>
-      <p>{props.coffeeStore.address}</p>
-      <p>{props.coffeeStore.name}</p>
+      <p>{address}</p>
+      <p>{name}</p>
+      <p>{neighbourhood}</p>
     </div>
   );
 };
