@@ -10,7 +10,7 @@ import styles from "../../styles/coffee-store.module.css";
 
 import cls from "classnames";
 
-import { StoreContext } from "../_app";
+import { StoreContext } from "../../store/store-context";
 
 import { isEmpty } from "../../utils";
 
