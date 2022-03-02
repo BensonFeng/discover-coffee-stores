@@ -12,44 +12,57 @@ const createCoffeeStore = async (req, res) => {
     const { id, name, neighbourhood, address, imgUrl, vote } = req.body;
     //find a record
     try {
-      const findCoffeeStoreRecords = await table
-        .select({
-          filterByFormula: `id=${id}`,
-        })
-        .firstPage();
+      if (id) {
+        const findCoffeeStoreRecords = await table
+          .select({
+            filterByFormula: `id=${id}`,
+          })
+          .firstPage();
 
-      console.log({ findCoffeeStoreRecords });
+        console.log({ findCoffeeStoreRecords });
 
-      if (findCoffeeStoreRecords.length !== 0) {
-        const records = findCoffeeStoreRecords.map((record) => {
-          return {
-            ...record.fields,
-          };
-        });
-        res.status(200).json(records);
+        if (findCoffeeStoreRecords.length !== 0) {
+          const records = findCoffeeStoreRecords.map((record) => {
+            return {
+              ...record.fields,
+            };
+          });
+          res.json(records);
+        } else {
+          // create a record
+
+          if (name) {
+            const createRecords = await table.create([
+              {
+                fields: {
+                  id,
+                  name,
+                  address,
+                  neighbourhood,
+                  vote,
+                  imgUrl,
+                },
+              },
+            ]);
+            const records = createRecords.map((record) => {
+              return {
+                ...record.fields,
+              };
+            });
+            res.json(records);
+          } else {
+            res.status(400);
+            res.json({ message: "Id or name is missing" });
+          }
+        }
       } else {
-        // create a record
-        const createRecords = await table.create([
-          {
-            fields: {
-              id,
-              name,
-              address,
-              neighbourhood,
-              vote,
-              imgUrl,
-            },
-          },
-        ]);
-        const records = createRecords.map((record) => {
-          return {
-            ...record.fields,
-          };
-        });
-        res.json({ records });
+        res.status(400);
+        res.json({ message: "Id is missing" });
       }
     } catch (err) {
-      res.status(500).send({ message: "Error finding store", err });
+      console.error("Error creating or finding store", err);
+      res.status(500);
+      res.json({ message: "Error creating or finding store", err });
     }
   }
 };
