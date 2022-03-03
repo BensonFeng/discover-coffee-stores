@@ -3,14 +3,13 @@ import { table, getMinifiedRecords } from "../../lib/airtable";
 const createCoffeeStore = async (req, res) => {
   if (req.method === "POST") {
     //find a record
-
-    const { id, name, neighbourhood, address, imgUrl, vote } = req.body;
-
+    console.log(req.body);
+    const { id, name, neighbourhood, address, imgUrl, voting } = req.body;
     try {
       if (id) {
         const findCoffeeStoreRecords = await table
           .select({
-            filterByFormula: `id=${id}`,
+            filterByFormula: `id="${id}"`,
           })
           .firstPage();
 
@@ -28,7 +27,7 @@ const createCoffeeStore = async (req, res) => {
                   name,
                   address,
                   neighbourhood,
-                  vote,
+                  voting,
                   imgUrl,
                 },
               },
@@ -46,9 +45,9 @@ const createCoffeeStore = async (req, res) => {
         res.json({ message: "Id is missing" });
       }
     } catch (err) {
-      console.error("Error creating or finding store", err);
+      console.error("Error creating or finding a store", err);
       res.status(500);
-      res.json({ message: "Error creating or finding store", err });
+      res.json({ message: "Error creating or finding a store", err });
     }
   }
 };
