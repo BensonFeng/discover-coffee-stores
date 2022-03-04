@@ -89,17 +89,22 @@ const CoffeeStore = (initialProps) => {
           handleCreateCoffeeStore(coffeeStoreFromContext);
         }
       }
+    } else {
+      handleCreateCoffeeStore(initialProps.coffeeStore);
     }
-  }, [id]);
+  }, [coffeeStores, id, initialProps, initialProps.coffeeStore]);
+
+  const { name, neighborhood, imgUrl, address } = coffeeStore;
+
+  const [votingCount, setVotingCount] = useState(0);
+  const handleUpvoteButton = () => {
+    let count = votingCount + 1;
+    setVotingCount(count);
+  };
 
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
-
-  const { location, name, neighborhood, imgUrl, address } = coffeeStore;
-  const handleUpvoteButton = () => {
-    console.log("this is upvote test");
-  };
   return (
     <div className={styles.layout}>
       <Head>
@@ -129,18 +134,33 @@ const CoffeeStore = (initialProps) => {
 
         <div className={cls("glass", styles.col2)}>
           <div className={styles.iconWrapper}>
-            <Image src="/static/icons/places.svg" width="24" height="24" />
+            <Image
+              src="/static/icons/places.svg"
+              width="24"
+              height="24"
+              alt="places icon"
+            />
             <p className={styles.text}>{address}</p>
           </div>
           {neighborhood && (
             <div className={styles.iconWrapper}>
-              <Image src="/static/icons/nearMe.svg" width="24" height="24" />
+              <Image
+                src="/static/icons/nearMe.svg"
+                width="24"
+                height="24"
+                alt="near me icon"
+              />
               <p className={styles.text}>{neighborhood}</p>
             </div>
           )}
           <div className={styles.iconWrapper}>
-            <Image src="/static/icons/star.svg" width="24" height="24" />
-            <p className={styles.text}>1</p>
+            <Image
+              src="/static/icons/star.svg"
+              width="24"
+              height="24"
+              alt="star icon"
+            />
+            <p className={styles.text}>{votingCount}</p>
           </div>
 
           <button className={styles.upvoteButton} onClick={handleUpvoteButton}>
