@@ -6,6 +6,9 @@ import { useRouter } from "next/router";
 // import coffeeStoresData from "../../data/coffee-stores.json";
 import { fetchCoffeeStores } from "../../lib/coffee-stores";
 
+import { fetcher } from "../../utils";
+import useSWR from "swr";
+
 import styles from "../../styles/coffee-store.module.css";
 
 import cls from "classnames";
@@ -96,7 +99,22 @@ const CoffeeStore = (initialProps) => {
 
   const { name, neighborhood, imgUrl, address } = coffeeStore;
 
-  const [votingCount, setVotingCount] = useState(0);
+  const [votingCount, setVotingCount] = useState(1);
+
+  const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, fetcher);
+
+  useEffect(() => {
+    if (data && data.length !== 0) {
+      console.log("from swr", data);
+      setCoffeeStore(data[0]);
+      setVotingCount(data[0].voting);
+    }
+  }, [data]);
+
+  if (error) {
+    return <div>Something went wrong retrieving coffee store page</div>;
+  }
+
   const handleUpvoteButton = () => {
     let count = votingCount + 1;
     setVotingCount(count);
