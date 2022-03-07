@@ -1,18 +1,16 @@
 import { useContext, useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
 import Image from "next/image";
-import { useRouter } from "next/router";
-// import coffeeStoresData from "../../data/coffee-stores.json";
-import { fetchCoffeeStores } from "../../lib/coffee-stores";
-
-import { fetcher } from "../../utils";
+//fetch using swr
 import useSWR from "swr";
-
-import styles from "../../styles/coffee-store.module.css";
 
 import cls from "classnames";
 
+import styles from "../../styles/coffee-store.module.css";
+import { fetchCoffeeStores } from "../../lib/coffee-stores";
+import { fetcher } from "../../utils";
 import { StoreContext } from "../../store/store-context";
 
 import { isEmpty } from "../../utils";
@@ -52,7 +50,9 @@ const CoffeeStore = (initialProps) => {
 
   const id = router.query.id;
 
-  const [coffeeStore, setCoffeeStore] = useState(initialProps.coffeeStore);
+  const [coffeeStore, setCoffeeStore] = useState(
+    initialProps.coffeeStore || {}
+  );
   const {
     state: { coffeeStores },
   } = useContext(StoreContext);
@@ -93,36 +93,58 @@ const CoffeeStore = (initialProps) => {
         }
       }
     } else {
+      //SSG
       handleCreateCoffeeStore(initialProps.coffeeStore);
     }
   }, [coffeeStores, id, initialProps, initialProps.coffeeStore]);
 
   const { name, neighborhood, imgUrl, address } = coffeeStore;
 
-  const [votingCount, setVotingCount] = useState(1);
+  const [votingCount, setVotingCount] = useState(0);
 
   const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, fetcher);
 
   useEffect(() => {
-    if (data && data.length !== 0) {
+    if (data && data.length > 0) {
       console.log("from swr", data);
       setCoffeeStore(data[0]);
+
+      console.log("voting count", data[0].voting);
       setVotingCount(data[0].voting);
     }
   }, [data]);
+
+  if (router.isFallback) {
+    return <div>Loading...</div>;
+  }
+
+  const handleUpvoteButton = async () => {
+    try {
+      const response = await fetch("/api/favouriteCoffeeStoreById", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+        }),
+      });
+
+      const dbCoffeeStore = await response.json();
+      console.log({ dbCoffeeStore });
+      if (dbCoffeeStore && dbCoffeeStore.length > 0) {
+        let count = votingCount + 1;
+        setVotingCount(count);
+      }
+    } catch (err) {
+      console.error("Error upvoting the coffee store", err);
+    }
+  };
 
   if (error) {
     return <div>Something went wrong retrieving coffee store page</div>;
   }
 
-  const handleUpvoteButton = () => {
-    let count = votingCount + 1;
-    setVotingCount(count);
-  };
-
-  if (router.isFallback) {
-    return <div>Loading...</div>;
-  }
   return (
     <div className={styles.layout}>
       <Head>
