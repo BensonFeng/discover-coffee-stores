@@ -33,7 +33,7 @@ export default function Home(props) {
 
   const { dispatch, state } = useContext(StoreContext);
   const { coffeeStores, latLong } = state;
-  console.log({ latLong, locationErrorMsg });
+  // console.log({ latLong, locationErrorMsg });
 
   useEffect(() => {
     (async () => {
@@ -58,10 +58,10 @@ export default function Home(props) {
         }
       }
     })();
-  }, [latLong]);
+  }, [dispatch, latLong]);
 
   const handleOnBannerBtnClick = () => {
-    console.log("hi banner button");
+    // console.log("hi banner button");
     handleTrackLocation();
   };
   return (

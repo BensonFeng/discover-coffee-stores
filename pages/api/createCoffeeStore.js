@@ -7,7 +7,7 @@ import {
 const createCoffeeStore = async (req, res) => {
   if (req.method === "POST") {
     //find a record
-    console.log(req.body);
+    // console.log(req.body);
     const { id, name, neighbourhood, address, imgUrl, voting } = req.body;
     try {
       if (id) {

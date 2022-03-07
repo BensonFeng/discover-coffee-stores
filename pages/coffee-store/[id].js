@@ -17,7 +17,7 @@ import { isEmpty } from "../../utils";
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
-  console.log("params", params);
+  // console.log("params", params);
 
   const coffeeStores = await fetchCoffeeStores();
   const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
@@ -76,7 +76,7 @@ const CoffeeStore = (initialProps) => {
       });
 
       const dbCoffeeStore = await response.json();
-      console.log({ dbCoffeeStore });
+      // console.log({ dbCoffeeStore });
     } catch (err) {
       console.error("Error creating coffee store", err);
     }
@@ -106,10 +106,10 @@ const CoffeeStore = (initialProps) => {
 
   useEffect(() => {
     if (data && data.length > 0) {
-      console.log("from swr", data);
+      // console.log("from swr", data);
       setCoffeeStore(data[0]);
 
-      console.log("voting count", data[0].voting);
+      // console.log("voting count", data[0].voting);
       setVotingCount(data[0].voting);
     }
   }, [data]);
@@ -131,7 +131,7 @@ const CoffeeStore = (initialProps) => {
       });
 
       const dbCoffeeStore = await response.json();
-      console.log({ dbCoffeeStore });
+      // console.log({ dbCoffeeStore });
       if (dbCoffeeStore && dbCoffeeStore.length > 0) {
         let count = votingCount + 1;
         setVotingCount(count);
